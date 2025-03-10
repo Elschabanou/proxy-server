@@ -13,10 +13,14 @@ app.get('/proxy', async (req, res) => {
 
   try {
     const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Error fetching URL: ${response.statusText}`);
+    }
     const data = await response.json();
     res.json(data);
   } catch (error) {
-    res.status(500).send('Error fetching URL');
+    console.error('Error fetching URL:', error.message);
+    res.status(500).send(`Error fetching URL: ${error.message}`);
   }
 });
 
