@@ -12,8 +12,12 @@ app.get('/proxy', async (req, res) => {
   }
 
   try {
+    console.log(`Fetching URL: ${url}`);
     const response = await fetch(url);
+    console.log(`Response status: ${response.status}`);
     if (!response.ok) {
+      const text = await response.text();
+      console.error(`Error fetching URL: ${response.statusText}, Response body: ${text}`);
       throw new Error(`Error fetching URL: ${response.statusText}`);
     }
     const data = await response.json();
