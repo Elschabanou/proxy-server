@@ -1,15 +1,14 @@
-import express from 'express';
-import fetch from 'node-fetch';
-
+const express = require("express");
+const fetch = require("node-fetch");
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
-app.get('/proxy', async (req, res) => {
+app.get("/proxy", async (req, res) => {
   const url = req.query.url;
   if (!url) {
-    return res.status(400).send('URL is required');
+    return res.status(400).send("URL is required");
   }
 
   try {
@@ -18,13 +17,15 @@ app.get('/proxy', async (req, res) => {
     console.log(`Response status: ${response.status}`);
     if (!response.ok) {
       const text = await response.text();
-      console.error(`Error fetching URL: ${response.statusText}, Response body: ${text}`);
+      console.error(
+        `Error fetching URL: ${response.statusText}, Response body: ${text}`
+      );
       throw new Error(`Error fetching URL: ${response.statusText}`);
     }
     const data = await response.json();
     res.json(data);
   } catch (error) {
-    console.error('Error fetching URL:', error.message);
+    console.error("Error fetching URL:", error.message);
     res.status(500).send(`Error fetching URL: ${error.message}`);
   }
 });
