@@ -24,7 +24,15 @@ app.get('/proxy', async (req, res) => {
     const text = await response.text();
     const parser = new XMLParser();
     const data = parser.parse(text);
-    res.json(data);
+
+    // Extract src links
+    const items = data.rss.channel.item;
+    const srcLinks = items.map(item => {
+      const match = item.description.match(/<img src="([^"]+)"/);
+      return match ? match[1] : null;
+    }).filter(src => src !== null).slice(0, 30);
+
+    res.json(srcLinks);
   } catch (error) {
     console.error('Error fetching URL:', error.message);
     res.status(500).send(`Error fetching URL: ${error.message}`);
