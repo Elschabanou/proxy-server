@@ -36,16 +36,20 @@ app.get("/proxy", async (req, res) => {
     const text = await response.text();
     const parser = new XMLParser();
     const data = parser.parse(text);
+    // Log the number of items in the RSS feed
+
+    const items = data.rss.channel.item;
+    console.log(`Number of items in RSS feed: ${items.length}`);
 
     // Extract src links
-    const items = data.rss.channel.item;
     const srcLinks = items
       .map((item) => {
         const match = item.description.match(/<img src="([^"]+)"/);
         return match ? match[1] : null;
       })
       .filter((src) => src !== null)
-      .slice(0, 50);
+      .slice(0, 60);
+    console.log(`Number of image links extracted: ${srcLinks.length}`);
 
     res.json(srcLinks);
   } catch (error) {
