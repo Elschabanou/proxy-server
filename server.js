@@ -1,23 +1,25 @@
-const express = require('express');
-const fetch = require('node-fetch');
-const { XMLParser } = require('fast-xml-parser');
+const express = require("express");
+const fetch = require("node-fetch");
+const {XMLParser} = require("fast-xml-parser");
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
   next();
 });
 
-
-app.get('/proxy', async (req, res) => {
+app.get("/proxy", async (req, res) => {
   const url = req.query.url;
   if (!url) {
-    return res.status(400).send('URL is required');
+    return res.status(400).send("URL is required");
   }
 
   try {
@@ -26,7 +28,9 @@ app.get('/proxy', async (req, res) => {
     console.log(`Response status: ${response.status}`);
     if (!response.ok) {
       const text = await response.text();
-      console.error(`Error fetching URL: ${response.statusText}, Response body: ${text}`);
+      console.error(
+        `Error fetching URL: ${response.statusText}, Response body: ${text}`
+      );
       throw new Error(`Error fetching URL: ${response.statusText}`);
     }
     const text = await response.text();
@@ -35,14 +39,17 @@ app.get('/proxy', async (req, res) => {
 
     // Extract src links
     const items = data.rss.channel.item;
-    const srcLinks = items.map(item => {
-      const match = item.description.match(/<img src="([^"]+)"/);
-      return match ? match[1] : null;
-    }).filter(src => src !== null).slice(0, 30);
+    const srcLinks = items
+      .map((item) => {
+        const match = item.description.match(/<img src="([^"]+)"/);
+        return match ? match[1] : null;
+      })
+      .filter((src) => src !== null)
+      .slice(0, 50);
 
     res.json(srcLinks);
   } catch (error) {
-    console.error('Error fetching URL:', error.message);
+    console.error("Error fetching URL:", error.message);
     res.status(500).send(`Error fetching URL: ${error.message}`);
   }
 });
